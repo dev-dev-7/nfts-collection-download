@@ -4,4 +4,4 @@
 
 2. python -m pip install requests
 
-3. python rightclick.py boredapeyachtclub cryptopunks
+3. python nft.py cryptopunks
