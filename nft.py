@@ -94,13 +94,14 @@ def download_asset(collection, asset):
 
     # USD value of the asset
     # Will be zero if no one was dumb enough to buy it yet
-    last_price = 0
+    nft_number = 1
 
     if asset["last_sale"] is not None:
-        token_price_usd = float(asset["last_sale"]["payment_token"]["usd_price"])
-        token_decimals = asset["last_sale"]["payment_token"]["decimals"]
-        total_price = int(asset["last_sale"]["total_price"]) / 10**(token_decimals)
-        last_price = int(total_price * token_price_usd)
+        # token_price_usd = float(asset["last_sale"]["payment_token"]["usd_price"])
+        # token_decimals = asset["last_sale"]["payment_token"]["decimals"]
+        # total_price = int(asset["last_sale"]["total_price"]) / 10**(token_decimals)
+        total_nft = nft_number
+        nft_number += total_nft
 
     # Download asset content
     req = requests.get(asset_url, stream=True)
@@ -127,9 +128,9 @@ def download_asset(collection, asset):
                 f.write(chunk)
 
     if not QUIET:
-        print(f"{asset_name} - ${last_price}")
+        print(f"{asset_name} - {nft_number}")
 
-    usd_total += last_price
+    usd_total += nft_number
 
 def parse_flag(flag):
     flag = flag.split("=")
@@ -153,10 +154,7 @@ def sig_handler(num, frame):
     finish()
 
 if __name__ == "__main__":
-    print("nft-rightclicker")
-    print("All your NFTs are mine now!")
-    print("k0rnh0li0 2021")
-    print("https://twitter.com/gr8_k0rnh0li0\n")
+    print("nfts-collection-download")
 
     if len(sys.argv) < 2:
         print("At least one NFT collection must be specified.")
