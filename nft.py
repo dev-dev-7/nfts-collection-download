@@ -18,12 +18,10 @@ PAGE_SIZE = 50
 
 # Configuration
 # If True, do not print info about individual assets
+
 QUIET = False
 # Directory to save downloaded collections to
 OUTPUT_DIR = "collections"
-
-# Total value of all downloaded NFTs
-usd_total = 0
 
 def download_collection(collection):
     assets = None
@@ -73,11 +71,8 @@ def download_collection(collection):
         page += 1
 
 def download_asset(collection, asset):
-    global usd_total
-
     # Name of this asset
     asset_name = asset["name"]
-
     if asset_name is None:
         asset_name = asset["token_id"]
 
@@ -86,22 +81,11 @@ def download_asset(collection, asset):
 
     if asset["animation_url"] is not None:
         asset_url = asset["animation_url"]
-    elif asset["image_url"] is not None:
-        asset_url = asset["image_url"]
+    elif asset["collection"]["large_image_url"] is not None:
+        asset_url = asset["collection"]["large_image_url"]
 
     if asset_url == "":
         return
-
-    # USD value of the asset
-    # Will be zero if no one was dumb enough to buy it yet
-    nft_number = 1
-
-    if asset["last_sale"] is not None:
-        # token_price_usd = float(asset["last_sale"]["payment_token"]["usd_price"])
-        # token_decimals = asset["last_sale"]["payment_token"]["decimals"]
-        # total_price = int(asset["last_sale"]["total_price"]) / 10**(token_decimals)
-        total_nft = nft_number
-        nft_number += total_nft
 
     # Download asset content
     req = requests.get(asset_url, stream=True)
@@ -125,12 +109,9 @@ def download_asset(collection, asset):
     with open(output_file, "wb") as f:
         for chunk in req.iter_content(chunk_size=1024):
             if chunk:
-                f.write(chunk)
-
-    if not QUIET:
-        print(f"{asset_name} - {nft_number}")
-
-    usd_total += nft_number
+             f.write(chunk)
+            if not QUIET:
+                print(asset_name)
 
 def parse_flag(flag):
     flag = flag.split("=")
@@ -147,7 +128,7 @@ def parse_flag(flag):
         exit()
 
 def finish():
-    print(f"\nYou acquired ${usd_total} worth of NFTs!\n")
+    print(f"\nYou acquired $ worth of NFTs!\n")
     exit()
 
 def sig_handler(num, frame):
