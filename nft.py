@@ -78,14 +78,18 @@ def download_asset(collection, asset):
 
     # URL of asset content
     asset_url = ""
+    metadata_json = ""
 
     if asset["animation_url"] is not None:
         asset_url = asset["animation_url"]
-    elif asset["collection"]["large_image_url"] is not None:
-        asset_url = asset["collection"]["large_image_url"]
+    elif asset["image_url"] is not None:
+        asset_url = asset["image_url"]
 
     if asset_url == "":
         return
+    
+    if asset["traits"] is not None:
+        metadata_json = asset["traits"]
 
     # Download asset content
     req = requests.get(asset_url, stream=True)
@@ -96,7 +100,7 @@ def download_asset(collection, asset):
     if "image" in ctype or "video" or "audio" in ctype:
         asset_ext = ctype.split("/")[1]
     else:
-        print(f"Unrecognized Content-Type: {ctype}")
+        #print(f"Unrecognized Content-Type: {ctype}")
         asset_ext = "bin"
 
     # Output file path
@@ -110,8 +114,15 @@ def download_asset(collection, asset):
         for chunk in req.iter_content(chunk_size=1024):
             if chunk:
              f.write(chunk)
+             #download metadata
+             text_file = open(f"{OUTPUT_DIR}/{collection}/{asset_name}.json", 'w')
+             my_string = metadata_json
+             print(my_string)
+             text_file.write(','.join(str(v) for v in my_string))
+             # text_file.close()
             if not QUIET:
                 print(asset_name)
+    
 
 def parse_flag(flag):
     flag = flag.split("=")
